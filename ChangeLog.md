@@ -17,6 +17,9 @@ See docs/process.md for how version tagging works.
 
 Current Trunk
 -------------
+ - `ERROR_ON_MISSING_LIBRARIES` now also applies to internal symbols that start
+   with `emscripten_`.  Prior to this change such missing symbols would result
+   in a runtime error, not they are reported at compile time.
  - Only MEMFS is included by default, others (NODEFS, IDBFS, WORKERFS, PROXYFS)
    must be linked in explicitly, using `-lnodefs.js`, `-lidbfs.js`',
    `-lworkerfs.js`, `-lproxyfs.js`. See #9645
