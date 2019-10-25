@@ -403,10 +403,6 @@ var LibraryPThread = {
               err('Thread ' + d['threadId'] + ': ' + d['text']);
             } else if (cmd === 'alert') {
               alert('Thread ' + d['threadId'] + ': ' + d['text']);
-#if PROXY_PTHREAD_ERRORS
-            } else if (cmd === 'error') {
-              throw new Error(d['message'] + ' (' + [d['filename'], d['lineno'], d['colno']] + ')', d['filename'], d['lineno']);
-#endif
             } else if (cmd === 'exit') {
               var detached = worker.pthread && Atomics.load(HEAPU32, (worker.pthread.thread + {{{ C_STRUCTS.pthread.detached }}}) >> 2);
               if (detached) {
@@ -435,6 +431,9 @@ var LibraryPThread = {
 
           worker.onerror = function(e) {
             err('pthread sent an error! ' + e.filename + ':' + e.lineno + ': ' + e.message);
+#if PROXY_PTHREAD_ERRORS
+//            throw new Error(e.message, e.filename, e.lineno);
+#endif
           };
         }(worker));
       }  // for each worker

@@ -9,12 +9,13 @@
 #include <assert.h>
 
 EM_JS(void*, ThreadMain, (void *arg), {
+  console.log("In worker " + typeof importScripts);
   throw "pthread FAIL";
 })
 
 EMSCRIPTEN_KEEPALIVE
 extern "C" void pthread_error(const char* c) {
-  printf("pthread reported an error: %s\n", c);
+  printf("C reporting of pthread error: %s\n", c);
 #ifdef REPORT_RESULT
   static int reported = 0;
   if (!reported) {
@@ -34,10 +35,14 @@ int main() {
   }
 
   EM_ASM({
+console.log("Listen for error" + typeof importScripts);
     window.addEventListener("error", function(error) {
-      Module._pthread_error(allocateUTF8OnStack([error.message, error.fileName, error.lineNumber].join(" ")));
+alert(['waka', error.message, error.filename, error.lineno, error.colno ]);
+      Module._pthread_error(allocateUTF8OnStack([error.message, error.filename, error.lineno, error.colno].join(" ")));
       assert(error.message.indexOf("pthread FAIL") >= 0);
-      assert(error.message.indexOf("test.worker.js") >= 0);
+      assert(error.filename.indexOf("test.worker.js") >= 0);
+      assert(error.lineno > 0);
+      assert(error.colno > 0);
     });
   });
 
