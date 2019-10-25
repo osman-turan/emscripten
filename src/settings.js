@@ -1302,6 +1302,11 @@ var DEFAULT_PTHREAD_STACK_SIZE = 2*1024*1024;
 // to show a popup dialog at startup so the user can configure this dynamically.
 var PTHREAD_HINT_NUM_CORES = 4;
 
+// If so, an uncaught exception in a pthread will be proxied to the main thread
+// to cause an error there. This allows a single event handler on the main
+// thread to notice errors across the main thread + pthreads.
+var PROXY_PTHREAD_ERRORS = 0;
+
 // True when building with --threadprofiler
 var PTHREADS_PROFILING = 0;
 

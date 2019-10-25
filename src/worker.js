@@ -37,13 +37,13 @@ function assert(condition, text) {
 }
 #endif
 
-// When error objects propagate from Web Worker to main thread, they lose helpful call stack and thread ID information, so print out errors early here,
-// before that happens.
+#if PROXY_PTHREAD_ERRORS
 this.addEventListener('error', function(e) {
   if (e.message.indexOf('SimulateInfiniteLoop') != -1) return e.preventDefault();
   // Update the main thread, where central error reporting can be done.
   postMessage({cmd: 'error', message: e.message, filename: e.filename, lineno: e.lineno, colno: e.colno});
 });
+#endif
 
 function threadPrintErr() {
   var text = Array.prototype.slice.call(arguments).join(' ');

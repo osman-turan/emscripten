@@ -16,7 +16,11 @@ EMSCRIPTEN_KEEPALIVE
 extern "C" void pthread_error(const char* c) {
   printf("pthread reported an error: %s\n", c);
 #ifdef REPORT_RESULT
-	REPORT_RESULT(1);
+  static int reported = 0;
+  if (!reported) {
+  	REPORT_RESULT(1);
+    reported = 1;
+  }
 #endif
 }
 
@@ -28,6 +32,14 @@ int main() {
     printf("Skipped: Threading is not supported.\n");
     return 0;
   }
+
+  EM_ASM({
+    window.addEventListener("error", function(error) {
+      Module._pthread_error(allocateUTF8OnStack([error.message, error.fileName, error.lineNumber].join(" ")));
+      assert(error.message.indexOf("pthread FAIL") >= 0);
+      assert(error.message.indexOf("test.worker.js") >= 0);
+    });
+  });
 
 	pthread_t thread;
 	int rc = pthread_create(&thread, NULL, ThreadMain, 0);
